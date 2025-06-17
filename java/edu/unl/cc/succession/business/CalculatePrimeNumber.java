@@ -3,7 +3,7 @@ package edu.unl.cc.succession.business;
 import edu.unl.cc.succession.domain.Successionable;
 
 /**
- * @author 
+ * @author
  * Steeven Pardo
  * Juan Calopino
  * Mark Gonzalez
@@ -12,21 +12,34 @@ import edu.unl.cc.succession.domain.Successionable;
  * Jessica Rivas
  */
 
+
 public class CalculatePrimeNumber implements Successionable {
 
-    private int terms; // Número de términos de la serie
-    private final StringBuilder printableTerms; // Representación textual de la serie
+    private Integer nTerms;
+    private Integer currentTerm;
+    private final StringBuilder printableTerms;
 
-    // Constructor: inicializa los términos y valida que sean mayores a 0
-    public CalculatePrimeNumber(int terms) {
-        if (terms <= 0) {
-            throw new IllegalArgumentException("El número de términos debe ser mayor a 0");
+    public CalculatePrimeNumber(Integer nTerms) {
+        this(2, nTerms);
+    }
+
+    /**
+     *
+     * @param start
+     * @param nTerms
+     */
+    public CalculatePrimeNumber(Integer start, Integer nTerms) {
+        if (start.intValue() < 2) {
+            throw new IllegalArgumentException("El numero primo inicial debe ser mayor o igual a 2.");
         }
-        this.terms = terms;
+        if (nTerms.intValue() <= 0) {
+            throw new IllegalArgumentException("El número de términos a calcular debe ser mayor a 0.");
+        }
+        this.currentTerm = start - 1;
+        setLimit(nTerms);
         this.printableTerms = new StringBuilder("S = ");
     }
 
-    // Encuentra el siguiente número primo después del término actual
     @Override
     public Number nextTerm(Number currentTerm) {
         int num = currentTerm.intValue() + 1;
@@ -36,42 +49,48 @@ public class CalculatePrimeNumber implements Successionable {
         return num;
     }
 
-    // Establece un nuevo límite de términos
+    private boolean isPrime(int num) {
+        if (num < 2) return false;
+        for (int i = 2; i <= Math.sqrt(num); i++) {
+            if (num % i == 0) return false;
+        }
+        return true;
+    }
+
     @Override
     public void setLimit(Number limit) {
-        this.terms = limit.intValue();
+        int lim = limit.intValue();
+        this.nTerms = lim;
     }
 
-    // Calcula la suma de la serie de números primos elevados al cubo
     @Override
     public Number calculate() {
-        int count = 0; // Contador de términos calculados
-        int currentPrime = 1; // Número primo actual
-        long sum = 0; // Suma acumulada de la serie
-
-        while (count < terms) {
-            currentPrime = nextTerm(currentPrime).intValue(); // Obtiene el siguiente primo
-            long cubed = (long) Math.pow(currentPrime, 3); // Eleva el primo al cubo
-            sum += cubed; // Suma el cubo al total
-            printableTerms.append(currentPrime).append("^3 + "); // Agrega el término a la representación textual
+        int count = 0;
+        int result = 0;
+        int nextPrimeNumber = this.currentTerm;
+        while (count < nTerms) {
+            nextPrimeNumber = nextTerm(nextPrimeNumber).intValue();
+            int cubo = (int) Math.pow(nextPrimeNumber, 3);
+            result += cubo;
+            printableTerms.append(nextPrimeNumber).append("^3");
+            if (count < nTerms - 1) printableTerms.append(" + ");
             count++;
         }
-
-        return sum; // Devuelve la suma total
+        return result;
     }
 
-    // Devuelve la representación textual de la serie
     @Override
     public String print() {
-        return printableTerms.toString().replaceAll("\\+ $", ""); // Elimina el último '+'
+        return printableTerms.toString();
     }
 
-    // Verifica si un número es primo
-    private boolean isPrime(int num) {
-        if (num < 2) return false; // Los números menores a 2 no son primos
-        for (int i = 2; i <= Math.sqrt(num); i++) { // Verifica divisibilidad hasta la raíz cuadrada
-            if (num % i == 0) return false; // Si es divisible, no es primo
-        }
-        return true; // Si no es divisible, es primo
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("CalculatePrimeNumber{ ");
+        sb.append("\nCantidad de terminos ingresados: ").append(nTerms);
+        sb.append("\nTermino inicial: ").append(currentTerm);
+        sb.append("\nSerie de numeros: ").append(printableTerms);
+        sb.append('}');
+        return sb.toString();
     }
 }
