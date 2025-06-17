@@ -1,4 +1,4 @@
-# 📊 CalculatePrimeNumber
+# 📊 Implementación de API locales en ejercicio práctico de sucesiones
 
 Autores:
  * Steeven Pardo
